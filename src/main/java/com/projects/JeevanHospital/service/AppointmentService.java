@@ -18,10 +18,14 @@ public interface AppointmentService {
     void deleteAppointment(Long appointmentId);
     
     AppointmentDetail updateAppointmentStatus(Long appointmentId, String status);
+
+	List<AppointmentDetail> getAppointmentsByDoctorId(Long doctorId);
+
+	List<AppointmentDetail> getAppointmentsByPatientId(Long patientId);
     
     // 🌟 Newly Added Historical & Dashboard Queries
-    List<AppointmentDetail> getAppointmentsByDoctorId(Long doctorId);
+  //  List<AppointmentDetail> getAppointmentsByDoctorId(Long doctorId);
     
-    List<AppointmentDetail> getAppointmentsByPatientId(Long patientId);
+   // List<AppointmentDetail> getAppointmentsByPatientId(Long patientId);
 
 }

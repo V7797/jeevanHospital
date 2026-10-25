@@ -16,17 +16,16 @@ import com.projects.JeevanHospital.repository.DoctorRepository;
 import com.projects.JeevanHospital.repository.PatientProfileRepository;
 import com.projects.JeevanHospital.service.AppointmentService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService {
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private DoctorRepository doctorRepository;
-
-    @Autowired
-    private PatientProfileRepository patientRepository;
+    
+    private final AppointmentRepository appointmentRepository;
+    private final DoctorRepository doctorRepository;
+    private final PatientProfileRepository patientRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -43,30 +42,26 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional
     public AppointmentDetail registerAppointment(AppointmentDetail appointment, Long doctorId, Long patientId) {
-        // 1. Verify Patient Profile exists
-        PatientProfile patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found with ID: " + patientId));
-
-        // 2. Verify Doctor Profile exists
-        DoctorProfile doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new IllegalArgumentException("Doctor profile not found with ID: " + doctorId));
-
-        // 3. Double-Booking Validation: Prevent scheduling overlapping patient hours
-        LocalDateTime requestedTime = appointment.getAppointmentDate();
-        List<AppointmentDetail> conflictingAppointments = appointmentRepository.findByDoctor_DoctorId(doctorId);
-        
-        boolean isDoctorBusy = conflictingAppointments.stream()
-                .anyMatch(existing -> existing.getAppointmentDate().equals(requestedTime) 
-                        && !"CANCELLED".equalsIgnoreCase(existing.getStatus()));
-        
-        if (isDoctorBusy) {
-            throw new IllegalStateException("The selected doctor is already booked at " + requestedTime);
-        }
-
-        // 4. Bind Verified Relationships
-        appointment.setPatient(patient);
-        appointment.setDoctor(doctor);
-        return appointmentRepository.save(appointment);
+    	//.AppointmentDetail byId = appointmentRepository.findById(patientId).orElseThrow(()->new IllegalArgumentException("Appointment not fpund with the id"+id));
+    	//1.check existing dr.profile
+    	DoctorProfile doctor = doctorRepository.findById(doctorId).orElseThrow(()->new IllegalStateException("Doctor not found with the id"+doctorId));
+    	//1.check existing patient.profile
+    	PatientProfile patient = patientRepository.findById(patientId).orElseThrow(()->new IllegalStateException("Patient not found with the id"+patientId));
+    	//3.check localdatetime request and database request by using appointmant repoository doctordata
+    	LocalDateTime requesttime=appointment.getAppointmentDate();
+    	List<AppointmentDetail> existappointment = appointmentRepository.findByDoctor_DoctorId(doctorId);
+    	boolean isdoctorbusy=existappointment.stream().anyMatch(ins->ins.getAppointmentDate().equals(requesttime));
+    	
+    	if (isdoctorbusy) {
+			throw new IllegalStateException("The selected doctor is already bookeed at"+requesttime);
+		}
+    	 	
+    	appointment.setPatient(patient);
+    	appointment.setDoctor(doctor);
+    	
+    	
+    	return appointmentRepository.save(appointment);
+       
     }
 
     @Override
@@ -79,9 +74,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         existingAppointment.setReasonForVisit(updatedRecord.getReasonForVisit());
         existingAppointment.setDiagnosisNotes(updatedRecord.getDiagnosisNotes());
         
-        if (updatedRecord.getStatus() != null) {
-            existingAppointment.setStatus(updatedRecord.getStatus().toUpperCase());
-        }
+        
 
         return appointmentRepository.save(existingAppointment);
     }

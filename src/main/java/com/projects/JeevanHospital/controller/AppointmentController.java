@@ -1,6 +1,8 @@
 package com.projects.JeevanHospital.controller;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,13 +69,13 @@ public class AppointmentController {
 
     // 7. GET: Dashboard tracking for specific Doctors
     @GetMapping("/doctor/{doctorId}")
-    public ResponseEntity<List<AppointmentDetail>> getAppointmentsByDoctorId(@PathVariable("doctorId") Long doctorId) {
-        return ResponseEntity.ok(appointmentService.getAppointmentsByDoctorId(doctorId));
+    public ResponseEntity<Optional<AppointmentDetail>> getAppointmentsByDoctorId(@PathVariable("doctorId") Long doctorId) {
+        return ResponseEntity.ok(appointmentService.getAppointmentById(doctorId));
     }
 
     // 8. GET: History tracking for specific Patients
     @GetMapping("/patient/{patientId}")
-    public ResponseEntity<List<AppointmentDetail>> getAppointmentsByPatientId(@PathVariable("patientId") Long patientId) {
-        return ResponseEntity.ok(appointmentService.getAppointmentsByPatientId(patientId));
+    public ResponseEntity<Optional<AppointmentDetail>> getAppointmentsByPatientId(@PathVariable("patientId") Long patientId) {
+        return ResponseEntity.ok(appointmentService.getAppointmentById(patientId));
     }
 }

@@ -50,7 +50,6 @@ public class WardRoomServiceImpl implements WardRoomService {
         existingRoom.setRoomNumber(updatedRecord.getRoomNumber());
         existingRoom.setRoomType(updatedRecord.getRoomType());
         existingRoom.setOccupied(updatedRecord.isOccupied());
-        //existingRoom.setDailyCharge(updatedRecord.getDailyCharge());
 
         return wardRoomRepository.save(existingRoom);
     }
